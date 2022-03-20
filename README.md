@@ -1,3 +1,4 @@
+# Shopify bot for chekcing availability of items in store
 # Getting Started
 
 A template for kick starting a Cloudflare worker project using [`workers-rs`](https://github.com/cloudflare/workers-rs).
