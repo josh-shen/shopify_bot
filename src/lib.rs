@@ -1,6 +1,8 @@
 use worker::*;
-use serde::{Serialize, Deserialize};
+use url::Url;
+use serde::{Serialize};
 use serde_json::Value;
+use itertools::izip;
 
 mod utils;
 
@@ -14,24 +16,31 @@ fn log_request(req: &Request) {
     );
 }
 
-#[derive(Serialize)]
+#[derive(Serialize)] 
 struct Item<'a>{
     name: &'a Value,
-    available: Vec<&'a Value>,
+    available: Vec<Links<'a>>,
     sold_out: Vec<&'a Value>
 }
 
-pub async fn fetch(uri: &str) -> Value{
+#[derive(Serialize)] 
+pub struct Links<'a>{
+    size: &'a Value,
+    price: &'a Value,
+    checkout_link: String
+}
+
+pub async fn fetch(uri: &str) -> Value {
     let client = reqwest::Client::new();
     let response = client
     .get(uri)
-    .header(reqwest::header::USER_AGENT, "v0.1.0")
+    .header(reqwest::header::USER_AGENT, "v0.2.0")
     .send().await.unwrap()
     .json::<Value>().await.unwrap();
 
     return response
 }
-pub fn find(value: &Value, keyword: &str) -> (Vec<usize>, Vec<Value>){
+pub fn find(value: &Value, keyword: &str) -> (Vec<usize>, Vec<Value>) {
     let mut indexes = Vec::new();
     let mut names = Vec::new();
 
@@ -48,9 +57,11 @@ pub fn find(value: &Value, keyword: &str) -> (Vec<usize>, Vec<Value>){
 
     return (indexes, names)
 }
-pub fn stock(value: &Value, index: usize) -> (Vec<&Value>, Vec<&Value>){
+pub fn stock_check(value: & Value, index: usize) -> (Vec<&Value>, Vec<&Value>, Vec<&Value>, Vec<&Value>) {
     let mut ist = Vec::new();
     let mut ost = Vec::new();
+    let mut ids = Vec::new();
+    let mut prices = Vec::new();
 
     let variants = value["products"][index]["variants"].as_array().unwrap();
 
@@ -59,6 +70,8 @@ pub fn stock(value: &Value, index: usize) -> (Vec<&Value>, Vec<&Value>){
             let (k, v) = val;
             if k == "available" && v == true{
                 ist.push(&variants[i]["title"]);
+                ids.push(&variants[i]["id"]);
+                prices.push(&variants[i]["price"]);
             }
             if k == "available" && v == false{
                 ost.push(&variants[i]["title"]);
@@ -66,7 +79,26 @@ pub fn stock(value: &Value, index: usize) -> (Vec<&Value>, Vec<&Value>){
         }
     }
 
-    return (ist, ost)
+    return (ist, ost, ids, prices)
+}
+pub fn generate_links<'a>(base_url: &str, variants: Vec<&'a Value>, prices: Vec<&'a Value>, ids: Vec<&Value>) -> Vec<Links<'a>>{
+    let mut links_vec = Vec::new();
+
+    for (variant, price, id) in izip!(&variants, &prices, &ids) {
+        let path = ["cart/", &id.to_string(), ":1"].concat();
+        let base = Url::parse(&base_url);
+        let link = base.unwrap().join(&path).unwrap().to_string();
+
+        let checkout_data = Links{
+            size: variant,
+            price: price,
+            checkout_link: link
+        };
+
+        links_vec.push(checkout_data);
+    }
+
+    return links_vec
 }
 
 #[event(fetch)]
@@ -78,19 +110,28 @@ pub async fn main(req: Request, env: Env, _ctx: worker::Context) -> Result<Respo
     let router = Router::new();
     router
         .post_async("/stock_check", |_req, _ctx| async move{
-            let response = fetch("https://ronindivision.com/collections/frontpage/products.json").await;
+            let base_url = "https://ronindivision.com/";
+            let products_json = "https://ronindivision.com/collections/frontpage/products.json";
+            let search_word = "Bucket";
+
+            let response = fetch(products_json).await;
             
             let mut item_vec = Vec::new();
+            
+            let (indexes_p, names) = find(&response, search_word);
+            for (i, index) in indexes_p.iter().enumerate(){
+                let (in_stock, out_stock, ids, prices) = stock_check(&response, *index);
 
-            let (indexes, names) = find(&response, "Jacket");
-            for i in indexes{
-                let (in_stock, out_stock) = stock(&response, i);
-                let item = Item{
-                    name: &names[i-1],
-                    available: in_stock,
-                    sold_out: out_stock
-                };
-                item_vec.push(item);
+                if !in_stock.is_empty(){
+                    let links = generate_links(base_url, in_stock, prices, ids);
+                    
+                    let item = Item{
+                        name: &names[i],
+                        available: links,
+                        sold_out: out_stock
+                    };
+                    item_vec.push(item);
+                }
             }
 
             Response::from_json(&item_vec)
