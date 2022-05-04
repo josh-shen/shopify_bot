@@ -48,7 +48,7 @@ pub fn find(value: &Value, keyword: &str) -> (Vec<usize>, Vec<Value>) {
     for i in 0..products.len() {
         for val in products[i].as_object().unwrap(){
             let (k, v) = val;
-            if k == "title" && v.to_string().contains(keyword){
+            if k == "title" && v.to_string().to_uppercase().contains(keyword){
                 indexes.push(i);
                 names.push(v.to_owned());
             }
@@ -57,7 +57,7 @@ pub fn find(value: &Value, keyword: &str) -> (Vec<usize>, Vec<Value>) {
 
     return (indexes, names)
 }
-pub fn stock_check(value: & Value, index: usize) -> (Vec<&Value>, Vec<&Value>, Vec<&Value>, Vec<&Value>) {
+pub fn stock_check(value: &Value, index: usize) -> (Vec<&Value>, Vec<&Value>, Vec<&Value>, Vec<&Value>) {
     let mut ist = Vec::new();
     let mut ost = Vec::new();
     let mut ids = Vec::new();
@@ -82,7 +82,7 @@ pub fn stock_check(value: & Value, index: usize) -> (Vec<&Value>, Vec<&Value>, V
     return (ist, ost, ids, prices)
 }
 pub fn generate_links<'a>(base_url: &str, variants: Vec<&'a Value>, prices: Vec<&'a Value>, ids: Vec<&Value>) -> Vec<Links<'a>>{
-    let mut links_vec = Vec::new();
+    let mut checkout_vec = Vec::new();
 
     for (variant, price, id) in izip!(&variants, &prices, &ids) {
         let path = ["cart/", &id.to_string(), ":1"].concat();
@@ -95,10 +95,10 @@ pub fn generate_links<'a>(base_url: &str, variants: Vec<&'a Value>, prices: Vec<
             checkout_link: link
         };
 
-        links_vec.push(checkout_data);
+        checkout_vec.push(checkout_data);
     }
 
-    return links_vec
+    return checkout_vec
 }
 
 #[event(fetch)]
@@ -112,7 +112,7 @@ pub async fn main(req: Request, env: Env, _ctx: worker::Context) -> Result<Respo
         .post_async("/stock_check", |_req, _ctx| async move{
             let base_url = "https://ronindivision.com/";
             let products_json = "https://ronindivision.com/collections/frontpage/products.json";
-            let search_word = "Bucket";
+            let search_word = "BUCKET"; //search words all uppercase to allow case insensitive search
 
             let response = fetch(products_json).await;
             
@@ -123,11 +123,11 @@ pub async fn main(req: Request, env: Env, _ctx: worker::Context) -> Result<Respo
                 let (in_stock, out_stock, ids, prices) = stock_check(&response, *index);
 
                 if !in_stock.is_empty(){
-                    let links = generate_links(base_url, in_stock, prices, ids);
+                    let checkouts = generate_links(base_url, in_stock, prices, ids);
                     
                     let item = Item{
                         name: &names[i],
-                        available: links,
+                        available: checkouts,
                         sold_out: out_stock
                     };
                     item_vec.push(item);
