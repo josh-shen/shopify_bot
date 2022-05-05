@@ -1,6 +1,6 @@
 use worker::*;
 use url::Url;
-use serde::{Serialize};
+use serde::{Serialize, Deserialize};
 use serde_json::Value;
 use itertools::izip;
 
@@ -16,13 +16,18 @@ fn log_request(req: &Request) {
     );
 }
 
+#[derive(Deserialize)]
+struct SearchRequest{
+    base_url: String,
+    products_json: String,
+    keyword: String
+}
 #[derive(Serialize)] 
 struct Item<'a>{
     name: &'a Value,
     available: Vec<Links<'a>>,
     sold_out: Vec<&'a Value>
 }
-
 #[derive(Serialize)] 
 pub struct Links<'a>{
     size: &'a Value,
@@ -34,7 +39,7 @@ pub async fn fetch(uri: &str) -> Value {
     let client = reqwest::Client::new();
     let response = client
     .get(uri)
-    .header(reqwest::header::USER_AGENT, "v0.2.0")
+    .header(reqwest::header::USER_AGENT, "v0.2.1")
     .send().await.unwrap()
     .json::<Value>().await.unwrap();
 
@@ -109,31 +114,32 @@ pub async fn main(req: Request, env: Env, _ctx: worker::Context) -> Result<Respo
 
     let router = Router::new();
     router
-        .post_async("/stock_check", |_req, _ctx| async move{
-            let base_url = "https://ronindivision.com/";
-            let products_json = "https://ronindivision.com/collections/frontpage/products.json";
-            let search_word = "BUCKET"; //search words all uppercase to allow case insensitive search
+        .post_async("/stock_check", |mut req, _ctx| async move{
+            let data: SearchRequest = match req.json().await {
+                Ok(res) => res,
+                Err(_) => return Response::error("Bad request", 400),
+            };
 
-            let response = fetch(products_json).await;
+            let response = fetch(&data.products_json).await;
             
             let mut item_vec = Vec::new();
             
-            let (indexes_p, names) = find(&response, search_word);
+            let (indexes_p, names) = find(&response, &data.keyword);
             for (i, index) in indexes_p.iter().enumerate(){
                 let (in_stock, out_stock, ids, prices) = stock_check(&response, *index);
 
                 if !in_stock.is_empty(){
-                    let checkouts = generate_links(base_url, in_stock, prices, ids);
+                    let checkout_data = generate_links(&data.base_url, in_stock, prices, ids);
                     
                     let item = Item{
                         name: &names[i],
-                        available: checkouts,
+                        available: checkout_data,
                         sold_out: out_stock
                     };
                     item_vec.push(item);
                 }
             }
-
+            
             Response::from_json(&item_vec)
         })
         .run(req, env).await
