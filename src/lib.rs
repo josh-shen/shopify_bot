@@ -39,7 +39,7 @@ pub async fn fetch(uri: &str) -> Value {
     let client = reqwest::Client::new();
     let response = client
     .get(uri)
-    .header(reqwest::header::USER_AGENT, "v0.2.1")
+    .header(reqwest::header::USER_AGENT, "v0.2.3")
     .send().await.unwrap()
     .json::<Value>().await.unwrap();
 
@@ -128,16 +128,14 @@ pub async fn main(req: Request, env: Env, _ctx: worker::Context) -> Result<Respo
             for (i, index) in indexes_p.iter().enumerate(){
                 let (in_stock, out_stock, ids, prices) = stock_check(&response, *index);
 
-                if !in_stock.is_empty(){
-                    let checkout_data = generate_links(&data.base_url, in_stock, prices, ids);
-                    
-                    let item = Item{
-                        name: &names[i],
-                        available: checkout_data,
-                        sold_out: out_stock
-                    };
-                    item_vec.push(item);
-                }
+                let checkout_data = generate_links(&data.base_url, in_stock, prices, ids);
+                
+                let item = Item{
+                    name: &names[i],
+                    available: checkout_data,
+                    sold_out: out_stock
+                };
+                item_vec.push(item);
             }
             
             Response::from_json(&item_vec)
