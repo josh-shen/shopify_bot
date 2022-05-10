@@ -35,6 +35,14 @@ pub struct Links<'a>{
     checkout_link: String
 }
 
+pub fn set_cors_headers() -> Result<Headers>{
+    let mut headers = Headers::new();
+    headers.set("Access-Control-Allow-Headers", "Content-Type")?;
+    headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")?;
+    headers.set("Access-Control-Allow-Origin", "*")?;
+
+    Ok(headers)
+}
 pub async fn fetch(uri: &str) -> Value {
     let client = reqwest::Client::new();
     let response = client
@@ -99,7 +107,6 @@ pub fn generate_links<'a>(base_url: &str, variants: Vec<&'a Value>, prices: Vec<
             price: price,
             checkout_link: link
         };
-
         checkout_vec.push(checkout_data);
     }
 
@@ -114,6 +121,12 @@ pub async fn main(req: Request, env: Env, _ctx: worker::Context) -> Result<Respo
 
     let router = Router::new();
     router
+        .options("/stock_check", |_req, _ctx| {
+            Ok(Response::empty()
+            .unwrap()
+            .with_headers(set_cors_headers().unwrap())
+            .with_status(204))
+        })
         .post_async("/stock_check", |mut req, _ctx| async move{
             let data: SearchRequest = match req.json().await {
                 Ok(res) => res,
@@ -137,8 +150,10 @@ pub async fn main(req: Request, env: Env, _ctx: worker::Context) -> Result<Respo
                 };
                 item_vec.push(item);
             }
-            
-            Response::from_json(&item_vec)
+
+            Ok(Response::from_json(&item_vec)
+            .unwrap()
+            .with_headers(set_cors_headers().unwrap()))
         })
         .run(req, env).await
 }
