@@ -1,11 +1,8 @@
 # Shopify bot Worker
-
+Follow this [guide](https://developers.cloudflare.com/workers/get-started/guide) from Cloudflare to setup Workers and `wrangler`
 ## Usage 
-
-This template starts you off with a `src/lib.rs` file, acting as an entrypoint for requests hitting
-your Worker. Feel free to add more code in this file, or create Rust modules anywhere else for this
-project to use. 
-
+This Worker accepts POST requests to the route /stock_check. Data wil be returned from the Worker will be in JSON format.  
+  
 With `wrangler`, you can build, test, and deploy your Worker with the following commands: 
 
 ```bash
