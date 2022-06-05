@@ -1,10 +1,4 @@
-# Shopify bot for chekcing availability of items in store
-# Getting Started
-
-A template for kick starting a Cloudflare worker project using [`workers-rs`](https://github.com/cloudflare/workers-rs).
-
-This template is designed for compiling Rust to WebAssembly and publishing the resulting worker to 
-Cloudflare's [edge infrastructure](https://www.cloudflare.com/network/).
+# Shopify bot Worker
 
 ## Usage 
 
