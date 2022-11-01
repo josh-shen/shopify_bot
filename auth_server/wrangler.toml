@@ -1,0 +1,9 @@
+name = "authorization-server"
+account_id = ""
+workers_dev = true
+compatibility_date = "2022-10-25"
+
+main = "index.js"
+
+[vars]
+PASSWORD = "password"
