@@ -1,0 +1,17 @@
+{
+  "private": true,
+  "name": "auth_server",
+  "version": "1.0.0",
+  "description": "A template for kick starting a Cloudflare Workers project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --write '**/*.{js,css,json,md}'"
+  },
+  "author": "j0aS5g2MdSEPz4sz3DcHxVqcFip <joshausneh@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@tsndr/cloudflare-worker-jwt": "^2.1.2",
+    "prettier": "^1.18.2"
+  }
+}
