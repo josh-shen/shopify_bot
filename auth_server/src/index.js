@@ -31,20 +31,23 @@ async function handleRequest(request) {
   else if (request.method === "POST"){
     const body = await request.json()
 
-    if (body.header == "login"){
+    if (body.header == "LOGIN"){
       if (body.payload == PASSWORD){
         const token = await createJWT()
 
-        return new Response(token, {header: corsHeaders})
+        return new Response(token, {headers: {...corsHeaders}})
       }
       else{
-        return new Response("error wrong password", {headers: corsHeaders})
+        return new Response("error wrong password", {headers: {...corsHeaders}})
       }
     }
-    else if (body.header == "verify"){
+    else if (body.header == "VERIFY"){
       const valid = await verify(body.payload)
 
-      return new Response(valid, {headers: corsHeaders})
+      return new Response(valid, {headers: {...corsHeaders}})
+    }
+    else {
+      return new Response("invalid header", {hedaers: {...corsHeaders}})
     }
   }
 }
