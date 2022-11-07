@@ -15,9 +15,13 @@ async function createJWT(){
   return token
 }
 async function verify(token){
-  const valid = await jwt.verify(token, SECRET, {algorithm: "HS256", throwError: false})
-  
-  return valid
+  try {
+    const valid = await jwt.verify(token, SECRET, {algorithm: "HS256", throwError: true})
+    return valid
+  }
+  catch(err){
+    return err
+  }
 }
 
 addEventListener('fetch', event => {
