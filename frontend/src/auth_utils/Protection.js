@@ -1,11 +1,12 @@
-import {Outlet, Navigate} from "react-router-dom"
+import {Navigate, Outlet} from "react-router-dom"
+import Cookies from "universal-cookie"
 
 const ProtectedRoute = () => {
-    let auth = {token: true} //temporary - will implement jwt auth later
+  const cookies = new Cookies
 
-    return (
-        auth.token ? <Outlet/> : <Navigate to="/"/>
-    )
+  return (
+    cookies.get("auth") === "true" ? <Outlet /> : <Navigate to="/" />
+  )
 }
 
 export default ProtectedRoute
