@@ -6,7 +6,7 @@ export default function Clock(){
     const [password, setPassword] = useState("")
     const cookies = new Cookies(); 
 
-    const url = process.env.REACT_APP_AUTH_SERVER_ROUTE
+    const url = AUTH_SERVER_ROUTE
 
     const handleSubmit = async (e) => {
         e.preventDefault()
