@@ -8,7 +8,7 @@ export default function Home() {
     const [shopState, setShopState] = useState(true)
     const [items, setItems] = useState([])
 
-    const url = process.env.REACT_APP_BOT_SERVER_ROUTE
+    const url = BOT_SERVER_ROUTE
     
     const sendSearch = async (data) => {
         const response = await fetch(url, {
