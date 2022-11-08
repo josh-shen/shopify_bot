@@ -8,7 +8,7 @@ export default function Home() {
     const [shopState, setShopState] = useState(true)
     const [items, setItems] = useState([])
 
-    const url = BOT_SERVER_ROUTE
+    const url = "https://bot-server.joshshen.workers.dev/stock_check"
     
     const sendSearch = async (data) => {
         const response = await fetch(url, {
