@@ -4,9 +4,10 @@ import Cookies from "universal-cookie"
 export default function Clock(){
     const [clockState, setClockState] = useState()
     const [password, setPassword] = useState("")
+    const cookies = new Cookies(); 
 
-    const url = "http://192.168.1.251:8787"
-    
+    const url = process.env.REACT_APP_AUTH_SERVER_ROUTE
+
     const handleSubmit = async (e) => {
         e.preventDefault()
 
@@ -24,10 +25,26 @@ export default function Clock(){
 
         const token = await response.text()
 
-        const cookies = new Cookies(); 
         cookies.set('token', token, { path: '/' });
+        getAuth()
     }
-
+    const getAuth = async () => {
+        const cookies = new Cookies()
+      
+        const data = {
+          header: "VERIFY",
+          payload: cookies.get("token") 
+        }
+        const response = await fetch(url, {      
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+        })
+        const text = await response.text()
+        cookies.set('auth', text, { path: '/' });
+    }
     function Time(){
         const date = new Date()
     
@@ -48,17 +65,22 @@ export default function Clock(){
 
     return (
         <div>
-            {clockState}  
-            <form onSubmit={handleSubmit}>
-                <input 
-                    required 
-                    className="form-control full-width"
-                    type="text" 
-                    name="name" 
-                    value={password} 
-                    onChange={e => setPassword(e.target.value)} 
-                />
-            </form>
-        </div>     
+            <div style={{position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',fontSize: "1.5em"}}>
+                {clockState}  
+            </div>  
+            <div style={{position: 'absolute', left: '50%', top: '54%', transform: 'translate(-50%, -50%)'}}>
+            {cookies.get("auth") === "true" ? <a href="/bot" style={{fontSize:"0.9em"}}>enter</a> : 
+                <form onSubmit={handleSubmit}>
+                    <input 
+                        required 
+                        type="text" 
+                        name="name"
+                        style={{textAlign:"center", border:"none", fontSize:"0.9em"}}
+                        value={password} 
+                        onChange={e => setPassword(e.target.value)} 
+                    />
+                </form>}
+            </div>
+        </div>  
     )
 }
