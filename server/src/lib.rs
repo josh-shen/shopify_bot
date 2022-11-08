@@ -25,6 +25,7 @@ struct SearchRequest{
 #[derive(Serialize)] 
 struct Item<'a>{
     name: &'a Value,
+    image: &'a Value,
     available: Vec<Links<'a>>,
     sold_out: Vec<&'a Value>
 }
@@ -35,19 +36,11 @@ pub struct Links<'a>{
     checkout_link: String
 }
 
-pub fn set_cors_headers() -> Result<Headers>{
-    let mut headers = Headers::new();
-    headers.set("Access-Control-Allow-Headers", "Content-Type")?;
-    headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")?;
-    headers.set("Access-Control-Allow-Origin", "*")?;
-
-    Ok(headers)
-}
 pub async fn fetch(uri: &str) -> Value {
     let client = reqwest::Client::new();
     let response = client
     .get(uri)
-    .header(reqwest::header::USER_AGENT, "v0.2.3")
+    .header(reqwest::header::USER_AGENT, "v0.2.4")
     .send().await.unwrap()
     .json::<Value>().await.unwrap();
 
@@ -58,6 +51,7 @@ pub fn find(value: &Value, keyword: &str) -> (Vec<usize>, Vec<Value>) {
     let mut names = Vec::new();
 
     let products = value["products"].as_array().unwrap();
+
     for i in 0..products.len() {
         for val in products[i].as_object().unwrap(){
             let (k, v) = val;
@@ -69,6 +63,11 @@ pub fn find(value: &Value, keyword: &str) -> (Vec<usize>, Vec<Value>) {
     }
 
     return (indexes, names)
+}
+pub fn get_images(value: &Value, index: usize) -> &Value {
+    let image = &value["products"][index]["images"][0]["src"];
+
+    return image
 }
 pub fn stock_check(value: &Value, index: usize) -> (Vec<&Value>, Vec<&Value>, Vec<&Value>, Vec<&Value>) {
     let mut ist = Vec::new();
@@ -122,9 +121,10 @@ pub async fn main(req: Request, env: Env, _ctx: worker::Context) -> Result<Respo
     let router = Router::new();
     router
         .options("/stock_check", |_req, _ctx| {
+            let cors = Cors::default();
             Ok(Response::empty()
             .unwrap()
-            .with_headers(set_cors_headers().unwrap())
+            .with_cors(&cors).unwrap()
             .with_status(204))
         })
         .post_async("/stock_check", |mut req, _ctx| async move{
@@ -139,21 +139,24 @@ pub async fn main(req: Request, env: Env, _ctx: worker::Context) -> Result<Respo
             
             let (indexes_p, names) = find(&response, &data.keyword);
             for (i, index) in indexes_p.iter().enumerate(){
+                let src = get_images(&response, *index);
                 let (in_stock, out_stock, ids, prices) = stock_check(&response, *index);
-
                 let checkout_data = generate_links(&data.base_url, in_stock, prices, ids);
                 
                 let item = Item{
                     name: &names[i],
+                    image: src,
                     available: checkout_data,
                     sold_out: out_stock
                 };
                 item_vec.push(item);
             }
 
+            let cors = Cors::default();
+            
             Ok(Response::from_json(&item_vec)
             .unwrap()
-            .with_headers(set_cors_headers().unwrap()))
+            .with_cors(&cors).unwrap())
         })
         .run(req, env).await
 }
