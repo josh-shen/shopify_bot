@@ -9,7 +9,7 @@ export default function Clock(){
     const {auth, setAuth} = useContext(AuthContext)
     const cookies = new Cookies(); 
 
-    const url = AUTH_SERVER_ROUTE
+    const url = env.AUTH_SERVER_ROUTE
 
     const handleSubmit = async (e) => {
         e.preventDefault()
