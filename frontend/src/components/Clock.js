@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
+import { Link } from "react-router-dom"
 import Cookies from "universal-cookie"
+import { AuthContext } from "../auth_utils/AuthContext"
 
 export default function Clock(){
     const [clockState, setClockState] = useState()
     const [password, setPassword] = useState("")
+    const {auth, setAuth} = useContext(AuthContext)
     const cookies = new Cookies(); 
 
     const url = "https://authorization-server.joshshen.workers.dev/"
@@ -29,8 +32,6 @@ export default function Clock(){
         getAuth()
     }
     const getAuth = async () => {
-        const cookies = new Cookies()
-      
         const data = {
           header: "VERIFY",
           payload: cookies.get("token") 
@@ -43,8 +44,9 @@ export default function Clock(){
           body: JSON.stringify(data)
         })
         const text = await response.text()
-        cookies.set('auth', text, { path: '/' });
+        setAuth(text)
     }
+    
     function Time(){
         const date = new Date()
     
@@ -66,10 +68,11 @@ export default function Clock(){
     return (
         <div>
             <div style={{position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',fontSize: "1.5em"}}>
-                {clockState}  
+                {auth} 
+                {clockState}
             </div>  
             <div style={{position: 'absolute', left: '50%', top: '54%', transform: 'translate(-50%, -50%)'}}>
-            {cookies.get("auth") === "true" ? <a href="/bot" style={{fontSize:"0.9em"}}>enter</a> : 
+            {auth === "true" ? <Link to="/bot" style={{fontSize:"0.9em"}}>enter</Link> : 
                 <form onSubmit={handleSubmit}>
                     <input 
                         required 
