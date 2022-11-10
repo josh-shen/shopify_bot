@@ -1,11 +1,12 @@
-import {Navigate, Outlet} from "react-router-dom"
-import Cookies from "universal-cookie"
+import { useContext } from "react"
+import { Navigate, Outlet } from "react-router-dom"
+import { AuthContext } from "./AuthContext"
 
 const ProtectedRoute = () => {
-  const cookies = new Cookies()
+  const {auth} = useContext(AuthContext)
 
   return (
-    cookies.get("auth") === "true" ? <Outlet /> : <Navigate to="/" />
+    auth === "true" ? <Outlet /> : <Navigate to="/" />
   )
 }
 

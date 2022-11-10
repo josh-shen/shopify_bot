@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
+import { Link } from "react-router-dom"
 import Cookies from "universal-cookie"
+import { AuthContext } from "../auth_utils/AuthContext"
 
 export default function Clock(){
     const [clockState, setClockState] = useState()
     const [password, setPassword] = useState("")
+    const {auth, setAuth} = useContext(AuthContext)
     const cookies = new Cookies(); 
 
-    const url = process.env.REACT_APP_AUTH_SERVER_ROUTE
+    const url = "https://authorization-server.joshshen.workers.dev/"
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -25,12 +28,10 @@ export default function Clock(){
 
         const token = await response.text()
 
-        cookies.set('token', token, { path: '/' });
+        cookies.set("token", token, { path: "/" });
         getAuth()
     }
     const getAuth = async () => {
-        const cookies = new Cookies()
-      
         const data = {
           header: "VERIFY",
           payload: cookies.get("token") 
@@ -43,8 +44,15 @@ export default function Clock(){
           body: JSON.stringify(data)
         })
         const text = await response.text()
-        cookies.set('auth', text, { path: '/' });
+        setAuth(text)
     }
+    const resetAuth = (e) => {
+        e.preventDefault()
+
+        setAuth("false")
+        setPassword("")
+    }
+
     function Time(){
         const date = new Date()
     
@@ -65,12 +73,19 @@ export default function Clock(){
 
     return (
         <div>
-            <div style={{position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',fontSize: "1.5em"}}>
-                {clockState}  
+            <div style={{position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)",fontSize: "1.5em"}}>
+                {clockState}
             </div>  
-            <div style={{position: 'absolute', left: '50%', top: '54%', transform: 'translate(-50%, -50%)'}}>
-            {cookies.get("auth") === "true" ? <a href="/bot" style={{fontSize:"0.9em"}}>enter</a> : 
-                <form onSubmit={handleSubmit}>
+            <div>
+            {auth === "true" ? 
+                <div style={{fontSize:"0.9em"}}>
+                    <Link style={{position: "absolute", left: "0%"}}to="/bot">
+                        <button className="btn btn-link">enter</button>
+                    </Link> 
+                    <button className="btn btn-link" style={{position: "absolute", right: "0%"}} onClick={resetAuth}>exit</button>
+                </div>
+                : 
+                <form onSubmit={handleSubmit} style={{position: "absolute", left: "50%", top: "53%", transform: "translate(-50%, -50%)"}}>
                     <input 
                         required 
                         type="text" 
