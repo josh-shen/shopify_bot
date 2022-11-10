@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react"
+import Cookies from "universal-cookie"
 import { AuthContext } from "../auth_utils/AuthContext"
 import Items from "./Items"
 
@@ -60,6 +61,9 @@ export default function Home() {
         e.preventDefault()
 
         setAuth("false")
+        
+        const cookies = new Cookies()
+        cookies.set("token", "", { path: "/" });
     }
 
     return (
