@@ -51,7 +51,7 @@ export default function Clock(){
 
         setAuth("false")
         setPassword("")
-        cookies.remove("token", {domain: "https://shopify-bot.pages.dev/", path"/"})
+        cookies.remove("token", {domain: "https://shopify-bot.pages.dev/", path: "/"})
     }
 
     function Time(){
