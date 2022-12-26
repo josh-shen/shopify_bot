@@ -8,7 +8,7 @@ const corsHeaders = {
 
 async function createJWT(){  
   const token = await jwt.sign({
-    exp: Math.floor(Date.now() / 1000) + (60 * 60) // Expires: Now + 1h
+    exp: Math.floor(Date.now() / 1000) + (60 * 15) // Expires: Now + 15m
   }, SECRET,
   {algorithm: "HS256"})
 
