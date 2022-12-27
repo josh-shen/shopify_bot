@@ -1,5 +1,4 @@
 import React, { useContext, useState } from "react"
-import Cookies from "universal-cookie"
 import { AuthContext } from "../auth_utils/AuthContext"
 import Items from "./Items"
 
@@ -61,9 +60,6 @@ export default function Home() {
         e.preventDefault()
 
         setAuth("false")
-        
-        const cookies = new Cookies()
-        cookies.set("token", "", { path: "/" });
     }
 
     return (
@@ -83,6 +79,12 @@ export default function Home() {
                                         data-productsjson="https://fearofgod.com/collections/essentials/products.json"
                                     >
                                         essentials
+                                    </option>
+                                    <option
+                                        data-shop="https://inakapower.com/"
+                                        data-productsjson="https://inakapower.com/collections/apparel/products.json?limit=250"
+                                    >
+                                        inaka
                                     </option>
                                     <option
                                         data-shop="https://ronindivision.com/"
