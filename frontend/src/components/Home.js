@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react"
+import Cookies from "universal-cookie"
 import { AuthContext } from "../auth_utils/AuthContext"
 import Items from "./Items"
 
@@ -8,7 +9,8 @@ export default function Home() {
     const [productsPage, setProductsPage] = useState("")
     const [shopState, setShopState] = useState(true)
     const [items, setItems] = useState([])
-    const {setAuth} = useContext(AuthContext)
+    const {auth, setAuth} = useContext(AuthContext)
+    const cookies = new Cookies()
 
     const url = "https://bot-server.joshshen.workers.dev/stock_check"
     
@@ -37,7 +39,8 @@ export default function Home() {
             products_json: productsPage,
             keyword: search.toUpperCase()
         }
-        sendSearch(body)
+        getAuth()
+        if (auth === "true"){ sendSearch(body) }
     }
     const sendSearch = async (data) => {
         const response = await fetch(url, {
@@ -55,6 +58,21 @@ export default function Home() {
         e.preventDefault()
 
         setItems([])
+    }
+    const getAuth = async () => {
+        const data = {
+          header: "VERIFY",
+          payload: cookies.get("token") 
+        }
+        const response = await fetch(url, {      
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+        })
+        const text = await response.text()
+        setAuth(text)
     }
     const resetAuth = (e) => {
         e.preventDefault()
