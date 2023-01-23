@@ -65,7 +65,7 @@ export default function Home() {
           header: "VERIFY",
           payload: cookies.get("token") 
         }
-        const response = await fetch(url, {      
+        const response = await fetch(auth_url, {      
           method: "POST",
           headers: {
               "Content-Type": "application/json"
