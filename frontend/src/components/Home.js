@@ -13,6 +13,7 @@ export default function Home() {
     const cookies = new Cookies()
 
     const url = "https://bot-server.joshshen.workers.dev/stock_check"
+    const auth_url = "https://authorization-server.joshshen.workers.dev/"
     
     const handleChange = (e) => {
         e.preventDefault()
