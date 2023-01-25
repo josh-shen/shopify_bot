@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import Cookies from "universal-cookie"
-import { AuthContext } from "../auth_utils/AuthContext"
+import { AuthContext } from "../auth_utils/authContext"
 
 export default function Clock(){
     const [clockState, setClockState] = useState()
@@ -61,9 +61,9 @@ export default function Clock(){
         let m = date.getMinutes()
         let s = date.getSeconds()
                 
-        h = (h < 10) ? "0" + h : h;
-        m = (m < 10) ? "0" + m : m;
-        s = (s < 10) ? "0" + s : s;
+        h = (h < 10) ? "0" + h : h
+        m = (m < 10) ? "0" + m : m
+        s = (s < 10) ? "0" + s : s
 
         let time = h + ":" + m + ":" + s
         setClockState(time)

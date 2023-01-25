@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
-import Home from "./Home"
-import Clock from "./Clock"
-import ProtectedRoute from "../auth_utils/Protection"
-import { ContextProvider } from "../auth_utils/AuthContext"
+import Home from "./pages/home"
+import Clock from "./pages/clock"
+import ProtectedRoute from "./auth_utils/protection"
+import { ContextProvider } from "./auth_utils/authContext"
 
 export default function App() {
 

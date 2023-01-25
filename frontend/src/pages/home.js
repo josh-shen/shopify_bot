@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react"
 import Cookies from "universal-cookie"
-import { AuthContext } from "../auth_utils/AuthContext"
-import Items from "./Items"
+import { AuthContext } from "../auth_utils/authContext"
+import Items from "../components/items"
 
 export default function Home() {
     const [search, setSearch] = useState("")
