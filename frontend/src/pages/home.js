@@ -1,38 +1,32 @@
 import React, { useContext, useState } from "react"
+import { Link } from "react-router-dom"
 import Cookies from "universal-cookie"
 import { AuthContext } from "../auth_utils/authContext"
 import Items from "../components/items"
+import "../styles/home.css"
 
 export default function Home() {
     const [search, setSearch] = useState("")
     const [shop, setShop] = useState("")
     const [productsPage, setProductsPage] = useState("")
-    const [shopState, setShopState] = useState(true)
     const [items, setItems] = useState([])
     const {auth, setAuth} = useContext(AuthContext)
     const cookies = new Cookies()
+    const [imageSource, setImageSource] = useState("")
 
     const url = "https://bot-server.joshshen.workers.dev/stock_check"
     const auth_url = "https://authorization-server.joshshen.workers.dev/"
     
-    const handleChange = (e) => {
+    function handleChange(e) {
         e.preventDefault()
 
-        const index = e.target.selectedIndex
-        const optionElement = e.target.childNodes[index]
-        const shop = optionElement.getAttribute("data-shop")
-        const productsJSON = optionElement.getAttribute("data-productsjson")
+        const shop = e.target.value
+        const productsJSON = shop + "/products.json?limit=250"
 
         setShop(shop)
         setProductsPage(productsJSON)
-        if (index !== 0){
-            setShopState(false)
-        }
-        else {
-            setShopState(true)
-        }
     }
-    const handleSubmit = async (e) => {
+    async function handleSubmit(e) {
         e.preventDefault()
 
         const body = {
@@ -43,7 +37,7 @@ export default function Home() {
         getAuth()
         if (auth === "true"){ sendSearch(body) }
     }
-    const sendSearch = async (data) => {
+    async function sendSearch(data) {
         const response = await fetch(url, {
             method: "POST",
             headers: {
@@ -55,12 +49,12 @@ export default function Home() {
         const items = await response.json()
         setItems(items)
     }
-    const clearPage = (e) => {
+    function clearPage(e) {
         e.preventDefault()
 
         setItems([])
     }
-    const getAuth = async () => {
+    async function getAuth() {
         const data = {
           header: "VERIFY",
           payload: cookies.get("token") 
@@ -75,65 +69,49 @@ export default function Home() {
         const text = await response.text()
         setAuth(text)
     }
-    const resetAuth = (e) => {
-        e.preventDefault()
-
-        setAuth("false")
-    }
 
     return (
-        <div>
-            <div style={{position: "absolute", right: "0%", top: "0%"}}>
-                <button className="btn btn-link" onClick={resetAuth}>exit</button>
+        <div id="container">
+            <div id="left">
+                <form id="form" onSubmit={handleSubmit}>
+                    <div>
+                        <input
+                            className="query"
+                            required
+                            type="text"
+                            name="store"
+                            placeholder="store"
+                            autoComplete="off"
+                            value={shop}
+                            onChange={handleChange}
+                        />
+                    </div>
+                    <div>
+                        <input 
+                            className="query"
+                            required 
+                            type="text" 
+                            name="name"
+                            placeholder="item"
+                            autoComplete="off"
+                            value={search} 
+                            onChange={e => setSearch(e.target.value)} 
+                        />
+                    </div>
+                    <div>
+                        <Link to="/" className="b">return</Link>
+                        {" "}
+                        <button className="b" onClick={clearPage}>clear</button>
+                        {" "}
+                        <input className="b" type="submit" value="search" />
+                    </div>
+                </form>
+                <div>
+                    <img id="image" src={imageSource} alt=""/>
+                </div>
             </div>
-            <div className="container">
-                <main className="site-main">
-                    <form onSubmit={handleSubmit}>
-                        <div className="grid">
-                            <div className="cell">
-                                <select className="full-width" onChange={handleChange}>
-                                    <option>---</option>
-                                    <option
-                                        data-shop="https://fearofgod.com/"
-                                        data-productsjson="https://fearofgod.com/collections/essentials/products.json"
-                                    >
-                                        essentials
-                                    </option>
-                                    <option
-                                        data-shop="https://inakapower.com/"
-                                        data-productsjson="https://inakapower.com/collections/apparel/products.json?limit=250"
-                                    >
-                                        inaka
-                                    </option>
-                                    <option
-                                        data-shop="https://ronindivision.com/"
-                                        data-productsjson="https://ronindivision.com/collections/frontpage/products.json?limit=250"
-                                    >
-                                        ronin
-                                    </option>
-                                </select>
-                            </div>
-                            <div className="cell">
-                                <input 
-                                    required 
-                                    className="form-control full-width"
-                                    type="text" 
-                                    name="name" 
-                                    value={search} 
-                                    onChange={e => setSearch(e.target.value)} 
-                                />
-                            </div>
-                        </div>
-                        <br/>
-                        <div className="cell">
-                                <input className="full-width" disabled={shopState} type="submit" value="search" />
-                        </div>
-                    </form>
-                    <Items items={items}/>
-                </main>
-            </div>
-            <div style={{position: "absolute", left: "0%", top: "0%"}}>
-                <button className="btn btn-link" onClick={clearPage}>clear</button>
+            <div id="right">
+                <Items items={items} setImageSource={setImageSource}/>
             </div>
         </div>
     )

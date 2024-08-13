@@ -1,9 +1,11 @@
-import React, { useContext, useEffect, useState } from "react"
+import React, { useContext, useEffect, useState, useRef } from "react"
 import { Link } from "react-router-dom"
 import Cookies from "universal-cookie"
 import { AuthContext } from "../auth_utils/authContext"
+import "../styles/clock.css"
 
 export default function Clock(){
+    const focusRef = useRef(null)
     const [clockState, setClockState] = useState()
     const [password, setPassword] = useState("")
     const {auth, setAuth} = useContext(AuthContext)
@@ -11,7 +13,7 @@ export default function Clock(){
 
     const url = "https://authorization-server.joshshen.workers.dev/"
 
-    const handleSubmit = async (e) => {
+    async function handleSubmit(e) {
         e.preventDefault()
 
         const data = {
@@ -31,7 +33,7 @@ export default function Clock(){
         cookies.set("token", token, { path: "/" });
         getAuth()
     }
-    const getAuth = async () => {
+    async function getAuth() {
         const data = {
           header: "VERIFY",
           payload: cookies.get("token") 
@@ -46,13 +48,21 @@ export default function Clock(){
         const text = await response.text()
         setAuth(text)
     }
-    const resetAuth = (e) => {
+    function resetAuth(e) {
         e.preventDefault()
 
         setAuth("false")
         setPassword("")
         cookies.set("token", "", { path: "/" })
     }
+    function regainFocus() {
+        focusRef.current.focus();
+    };
+    useEffect(() => {
+        if (focusRef.current) {
+            focusRef.current.focus();
+        }
+    }, []);
 
     function Time(){
         const date = new Date()
@@ -73,29 +83,32 @@ export default function Clock(){
     }, [])
 
     return (
-        <div>
-            <div style={{position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)",fontSize: "1.5em"}}>
+        <div id="clock-container">
+            <div id="clock">
                 {clockState}
             </div>  
             <div>
-            {auth === "true" ? 
-                <div style={{fontSize:"0.9em"}}>
-                    <Link style={{position: "absolute", left: "0%"}}to="/bot">
-                        <button className="btn btn-link">enter</button>
-                    </Link> 
-                    <button className="btn btn-link" style={{position: "absolute", right: "0%"}} onClick={resetAuth}>exit</button>
-                </div>
-                : 
-                <form onSubmit={handleSubmit} style={{position: "absolute", left: "50%", top: "53%", transform: "translate(-50%, -50%)"}}>
-                    <input 
-                        required 
-                        type="text" 
-                        name="name"
-                        style={{textAlign:"center", border:"none", fontSize:"0.9em"}}
-                        value={password} 
-                        onChange={e => setPassword(e.target.value)} 
-                    />
-                </form>}
+                {auth === "true" ? 
+                    <div id="grid">
+                        <Link to="/bot" className="buttons">enter</Link> 
+                        <Link to="/about" className="buttons">about</Link>
+                        <button id="layer3" className="buttons" onClick={resetAuth}>exit</button>
+                    </div>
+                    : 
+                    <form onSubmit={handleSubmit}>
+                        <input 
+                            id="entrance"
+                            ref={focusRef}
+                            onBlur={regainFocus}
+                            autoFocus
+                            autoComplete="off"
+                            required 
+                            type="password"
+                            name="name"
+                            value={password} 
+                            onChange={e => setPassword(e.target.value)} 
+                        />
+                    </form>}
             </div>
         </div>  
     )
