@@ -1,0 +1,34 @@
+#clock-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0 auto;
+    width: 123px;
+    height: 94px;
+}
+#clock {
+    font-size: 34px;
+}
+#entrance {
+    border: none;
+    outline: none;
+    padding: 1px;
+}  
+#grid {
+    display: grid;
+}
+.buttons {
+    border: none;
+    padding: 0;
+    text-decoration: underline;
+    cursor: pointer;
+    background-color: transparent;
+    color: black;
+
+    margin-bottom: 3px;
+    margin-right: auto;
+    
+    font-size: 12px;
+    font-family: monospace;
+}

@@ -1,0 +1,49 @@
+#container {
+    font-family: monospace;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+#left {
+    position: fixed;
+    width: 50%;
+    left: 0;
+    height: 100%;
+    z-index: 1010101010;
+}
+#right {
+    position: absolute;
+    width: 50%;
+    left: 50%;
+    height: 100%;
+    z-index: 1010101010;
+}
+#form {
+    justify-content: right;
+    float: right;
+}
+#image {
+    width: 70%;
+    margin-top: 10%;
+    margin-left: 60%;
+    transform: translate(-50%);
+}
+.query {
+    border: 0;
+    outline: none;
+    border-bottom: 1px solid black;
+    width: 400px;
+
+    font-family: monospace;
+    text-align: left;
+}
+.b{
+    border: none;
+    padding: 0;
+    text-decoration: underline;
+    cursor: pointer;
+    background-color: transparent;
+    font-size: 12px;
+    font-family: monospace;
+
+    color: black;
+}

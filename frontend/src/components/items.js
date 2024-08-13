@@ -1,14 +1,14 @@
 import React from "react"
 import Item from "./item"
+import "../styles/item.css"
 
-const Items = ({items}) => {
+export default function Items({items, setImageSource}) {
+
     return (
-        <div className="grid">
+        <div>
             {items.map((item, i) => {
-                return <Item class="cell" key={i} {...item}></Item>
+                return <Item key={i} {...item} setImageSource={setImageSource}/>
             })}
         </div>
     )
 }
-
-export default Items
