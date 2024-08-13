@@ -2,11 +2,7 @@
 
 ## Server backend
 Cloudflare Worker written in Rust. 
-Uses data from POST request from user to find item on a Shopify site. Returns item sizes, availability, price, and checkout link for items found and in stock.
-
-Current sites supported: 
-- ESSENTIALS
-- RONIN
+Uses data from POST request from user to find item on a Shopify site. Returns matching item sizes, availability, price, and with immediate checkout link for items found in stock.
 
 ## App frontend
 JS React webapp to interact with server backend. 
@@ -16,3 +12,4 @@ Any items found matching the keyword will be displayed on the page with a checko
 <p align="center">
   <img src="capture.gif">
  </p>
+<sub><sub>use password coffee</sub></sub>
