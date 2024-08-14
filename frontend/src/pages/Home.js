@@ -52,6 +52,8 @@ export default function Home() {
     function clearPage(e) {
         e.preventDefault()
 
+        setSearch("")
+        setShop("")
         setItems([])
     }
     async function getAuth() {
@@ -98,7 +100,7 @@ export default function Home() {
                             onChange={e => setSearch(e.target.value)} 
                         />
                     </div>
-                    <div>
+                    <div id="buttons">
                         <Link to="/" className="b">return</Link>
                         {" "}
                         <button className="b" onClick={clearPage}>clear</button>

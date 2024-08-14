@@ -13,14 +13,14 @@
 #entrance {
     border: none;
     outline: none;
-    padding: 1px;
+    padding: 3px;
 }  
 #grid {
     display: grid;
 }
 .buttons {
     border: none;
-    padding: 0;
+    padding: 0 0 0 2px;
     text-decoration: underline;
     cursor: pointer;
     background-color: transparent;

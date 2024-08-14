@@ -21,10 +21,15 @@
     justify-content: right;
     float: right;
 }
+#buttons {
+    width: fit-content;
+    margin-left: auto;
+    margin-right: 0;
+}
 #image {
     width: 70%;
     margin-top: 10%;
-    margin-left: 60%;
+    margin-left: 54%;
     transform: translate(-50%);
 }
 .query {
@@ -42,6 +47,7 @@
     text-decoration: underline;
     cursor: pointer;
     background-color: transparent;
+
     font-size: 12px;
     font-family: monospace;
 
