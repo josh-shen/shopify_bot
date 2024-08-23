@@ -101,11 +101,11 @@ export default function Home() {
                         />
                     </div>
                     <div id="buttons">
-                        <Link to="/" className="b">return</Link>
+                        <input className="b" type="submit" value="search" />
                         {" "}
                         <button className="b" onClick={clearPage}>clear</button>
                         {" "}
-                        <input className="b" type="submit" value="search" />
+                        <Link to="/" className="b">return</Link>
                     </div>
                 </form>
                 <div>
