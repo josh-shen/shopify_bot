@@ -1,12 +1,4 @@
-name = "bot_server"
-account_id = ""
-workers_dev = true
-compatibility_date = "2022-02-19"
-main = "./build/worker/shim.mjs"
-
-[vars]
-WORKERS_RS_VERSION = "0.0.9"
-
-[build]
-command = "cargo install -q worker-build && worker-build --release" # required
-
+name = "server"
+main = "src/index.js"
+compatibility_date = "2024-08-21"
+compatibility_flags = ["nodejs_compat"]
