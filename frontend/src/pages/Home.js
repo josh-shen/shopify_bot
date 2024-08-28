@@ -14,7 +14,7 @@ export default function Home() {
     const cookies = new Cookies()
     const [imageSource, setImageSource] = useState("")
 
-    const url = "https://bot-server.joshshen.workers.dev/stock_check"
+    const url = "https://server.joshshen.workers.dev/stock_check"
     const auth_url = "https://authorization-server.joshshen.workers.dev/"
     
     function handleChange(e) {
@@ -38,16 +38,21 @@ export default function Home() {
         if (auth === "true"){ sendSearch(body) }
     }
     async function sendSearch(data) {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data)
-        })
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data)
+            })
 
-        const items = await response.json()
-        setItems(items)
+            const items = await response.json()
+            setItems(items)
+        } catch {
+            console.log("could not fetch")
+            setItems([])
+        }
     }
     function clearPage(e) {
         e.preventDefault()
