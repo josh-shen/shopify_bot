@@ -1,8 +1,8 @@
 # Shopify Bot
 
 ## Server backend
-Cloudflare Worker written in Rust. 
-Uses data from POST request from user to find item on a Shopify site. Returns matching item sizes, availability, price, and with immediate checkout link for items found in stock.
+Backend API deployed on Cloudflare Workers.
+Uses data from POST request from user to find items on a specified Shopify site. Returns matching item sizes, availability, price, and with immediate checkout link for items found in stock.
 
 ## App frontend
 JS React webapp to interact with server backend. 
