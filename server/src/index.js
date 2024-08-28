@@ -1,8 +1,3 @@
-const corsHeaders = {
-    'Access-Control-Allow-Headers': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Origin': '*'
-}
 async function fetch_site(url) {
     try {
         const response = await fetch(url, {
@@ -20,6 +15,7 @@ async function fetch_site(url) {
         console.error(error.message)
     }
 }
+
 function find(value, keyword) {
     let indexes = []
     let names = []
@@ -36,11 +32,13 @@ function find(value, keyword) {
 
     return [indexes, names]
 }
+
 function get_images(value, index) {
     const image = value["products"][index]["images"][0]["src"]
 
     return image
 }
+
 function stock_check(value, index) {
     let in_stock = []
     let out_stock = []
@@ -64,6 +62,7 @@ function stock_check(value, index) {
 
     return [in_stock, out_stock, ids, prices]
 }
+
 function generate_links (base_url, variants, prices, ids) {
     let checkout = []
 
@@ -84,6 +83,12 @@ function generate_links (base_url, variants, prices, ids) {
 
 export default {
 	async fetch(request, env, ctx) {
+        const corsHeaders = {
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Origin': '*'
+        }
+        
 		if (request.method === "OPTIONS") {
             return new Response("OK", {headers: corsHeaders})
         }
@@ -117,7 +122,7 @@ export default {
                 items.push(item)
             }
 
-            return Response.json(items)
+            return Response.json(items, {headers: corsHeaders})
         }
 	}
 };
