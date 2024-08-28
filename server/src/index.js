@@ -12,7 +12,7 @@ async function fetch_site(url) {
         });
 
         if (!response.ok) {
-            return "Could not find or access site"
+            return false
         }
 
         return await response.json()  
