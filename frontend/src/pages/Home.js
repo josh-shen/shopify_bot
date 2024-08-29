@@ -13,6 +13,8 @@ export default function Home() {
     const {auth, setAuth} = useContext(AuthContext)
     const cookies = new Cookies()
     const [imageSource, setImageSource] = useState("")
+    const [error, setError] = useState(false)
+    const [emptyFlag, setEmptyFlag] = useState(false)
 
     const url = "https://server.joshshen.workers.dev/stock_check"
     const auth_url = "https://authorization-server.joshshen.workers.dev/"
@@ -48,10 +50,15 @@ export default function Home() {
             })
 
             const items = await response.json()
+
+            items.length === 0 ? setEmptyFlag(true) : setEmptyFlag(false)
             setItems(items)
+            setError(false)
         } catch {
             console.log("could not fetch")
+            setShop("")
             setItems([])
+            setError(true)
         }
     }
     function clearPage(e) {
@@ -118,7 +125,10 @@ export default function Home() {
                 </div>
             </div>
             <div id="right">
-                <Items items={items} setImageSource={setImageSource}/>
+                {error === true ? <div id="fetch_error"> {'< '}that URL you entered didn't work</div>
+                    : emptyFlag === true ? <div id="no_res">{'< '}no results found</div>
+                    : <Items items={items} setImageSource={setImageSource}/>
+                }
             </div>
         </div>
     )

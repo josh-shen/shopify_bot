@@ -53,3 +53,13 @@
 
     color: black;
 }
+#fetch_error {
+    color: red;
+    padding-left: 10px;
+    padding-top: 2px;
+}
+#no_res {
+    color: red;
+    padding-left: 10px;
+    padding-top: 22px;
+}
